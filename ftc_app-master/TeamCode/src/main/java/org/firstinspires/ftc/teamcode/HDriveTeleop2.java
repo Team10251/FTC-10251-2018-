@@ -18,6 +18,7 @@ import java.util.Locale;
 @TeleOp(name= "HDriveTeleop2")
 public class HDriveTeleop2 extends OpMode {
     double[] rollAngle = new double[2], pitchAngle = new double[2], yawAngle = new double[2];
+    float rightX;
     Orientation angles;
     BNO055IMU imu;
     String angleDouble = "hi";
@@ -42,6 +43,7 @@ public class HDriveTeleop2 extends OpMode {
     Servo servo2;
     double armAngle = .5;
     double offset = 0;
+    double yAngle = 0;
     int encoder = 0;
     int shootTimer = 6;
     boolean bumperPressed = false;
@@ -56,6 +58,7 @@ public class HDriveTeleop2 extends OpMode {
     boolean state1;
     boolean closedClaw = false;
     boolean runningclaw = false;
+    boolean firstY = true;
     int glyphCounter = 0;
     int glyphLevel = 0;
     Servo IntakeServo;
@@ -83,7 +86,7 @@ public class HDriveTeleop2 extends OpMode {
         //shooter = hardwareMap.dcMotor.get("shooter");
         //servo3 = hardwareMap.servo.get("servo3");
         //arm = hardwareMap.dcMotor.get("arm");
-        //servo2 = hardwareMap.servo.get("servo2");
+        //servo2 = hardwareMap .servo.get("servo2");
         //buttonPusher = hardwareMap.servo.get("servo2");
         calculator = new HDriveFCCalc();
         //servo = hardwareMap.crservo.get("servo");
@@ -109,7 +112,9 @@ public class HDriveTeleop2 extends OpMode {
         angleDouble = formatAngle(angles.angleUnit, angles.firstAngle);
         float leftX = gamepad1.left_stick_x;
         float leftY = gamepad1.left_stick_y;
-        float rightX = gamepad1.right_stick_x;
+        if(gamepad1.y != true) {
+            rightX = gamepad1.right_stick_x;
+        }
         float rightY = gamepad1.right_stick_y;
         float left = gamepad1.left_trigger;
         float right = gamepad1.right_trigger;
@@ -167,10 +172,19 @@ public class HDriveTeleop2 extends OpMode {
         //telemetry.addData("Right Stick Y" , gamepad1.right_stick_y);
         //telemetry.update();
         if(gamepad1.y) {
-            lezGoSlow = true;
+            if(firstY) {
+                firstY = false;
+                yAngle = Double.parseDouble(angleDouble) + offset;
+            }
+            if((Double.parseDouble(angleDouble) + offset) < (yAngle + 180)) {
+                rightX = 1;
+            }
+            else{
+                rightX = 0;
+            }
         }
         else {
-            lezGoSlow = false;
+            firstY = true;
         }
         if(buttonXPressed == true){
             offset = Double.parseDouble(angleDouble);
@@ -209,7 +223,10 @@ public class HDriveTeleop2 extends OpMode {
          rightMotor.setPower(.1);
 <<<<<<< HEAD
      }*/
-        telemetry.addData("glyph Motor", glyphMotor.getCurrentPosition());
+        telemetry.addData("left Motor", leftMotor.getCurrentPosition());
+        telemetry.addData("right Motor", rightMotor.getCurrentPosition());
+        telemetry.addData("Angle", Double.parseDouble(angleDouble) + offset);
+        telemetry.addData("Angle 2", yAngle);
         telemetry.update();
         if(gamepad1.x) {
             arm.setPower(-.3); //4900 encoder arm counts

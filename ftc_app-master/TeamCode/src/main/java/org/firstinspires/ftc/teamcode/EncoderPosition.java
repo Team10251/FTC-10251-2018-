@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -27,7 +28,6 @@ import java.util.Locale;
 
 
 // * Created by definitly not HIRSH as he would mess it up and it would explode on 8/18/2016.
-@Disabled
 @TeleOp(name= "Encoder Tester")
 public class EncoderPosition extends OpMode {
     double[] rollAngle = new double[2], pitchAngle = new double[2], yawAngle = new double[2];
@@ -36,11 +36,10 @@ public class EncoderPosition extends OpMode {
     String angleDouble = "hi";
     public double gyroAngle;
     boolean speedMode = false;
-    DcMotor leftMotor;
-    DcMotor rightMotor;
-    DcMotor middleMotor;
-    DcMotor hirshIsDumb; //Pulley
-    DcMotor arm;
+    DcMotorEx leftMotor;
+    DcMotorEx rightMotor;
+    DcMotorEx middleMotor;
+    DcMotorEx glyphMotor; //Pulley
     Servo servo;
     Servo servo3;
     int state = 0;
@@ -79,11 +78,10 @@ public class EncoderPosition extends OpMode {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
-        leftMotor = hardwareMap.dcMotor.get("leftMotor");
-        rightMotor = hardwareMap.dcMotor.get("rightMotor");
-        middleMotor = hardwareMap.dcMotor.get("middleMotor");
-        hirshIsDumb = hardwareMap.dcMotor.get("Hirsh is very dumb");
-        arm = hardwareMap.dcMotor.get("arm");
+        leftMotor = (DcMotorEx)hardwareMap.get(DcMotor.class,"leftMotor");
+        rightMotor = (DcMotorEx)hardwareMap.get(DcMotor.class, "rightMotor");
+        middleMotor = (DcMotorEx)hardwareMap.get(DcMotor.class, "middleMotor");
+        glyphMotor = (DcMotorEx)hardwareMap.get(DcMotor.class, "Hirsh is very dumb");
         //shooter = hardwareMap.dcMotor.get("shooter");
         //servo3 = hardwareMap.servo.get("servo3");
         //arm = hardwareMap.dcMotor.get("arm");
@@ -96,7 +94,10 @@ public class EncoderPosition extends OpMode {
         //servo = hardwareMap.crservo.get("servo");
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
         middleMotor.setDirection(DcMotor.Direction.REVERSE);
-        hirshIsDumb.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        glyphMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        middleMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
@@ -121,137 +122,11 @@ public class EncoderPosition extends OpMode {
         boolean dPadDown  = gamepad1.dpad_down;
         boolean dPadLeft  = gamepad1.dpad_left;
         boolean dPadRight = gamepad1.dpad_right;
-        if(state == 0) {
-            middleMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            middleMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            int y = 0;
-            telemetry.addData("Running", "Middle Motor");
-            telemetry.update();
-            while(y < 5000) {
-                if(gamepad1.left_bumper) {
-                    state++;
-                    return;
-                }
-            }
-            if(gamepad1.left_trigger == 1) {
-                middleMotor.setPower(.2);
-                telemetry.addData("Encoder Position", middleMotor.getCurrentPosition());
-                telemetry.update();
-            }
-            if(gamepad1.right_trigger == -1) {
-                middleMotor.setPower(-.2);
-                telemetry.addData("Encoder Position", middleMotor.getCurrentPosition());
-                telemetry.update();
-            }
-            if(gamepad1.left_bumper && state == 0) {
-                state++;
-            }
-        }
-        if(state == 1) {
-            leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            int y = 0;
-            telemetry.addData("Running", "Left Motor");
-            telemetry.update();
-            while(y < 5000) {
-                if(gamepad1.left_bumper) {
-                    state++;
-                    return;
-                }
-            }
-            if(gamepad1.left_trigger == 1) {
-                leftMotor.setPower(.2);
-                telemetry.addData("Encoder Position", leftMotor.getCurrentPosition());
-                telemetry.update();
-            }
-            if(gamepad1.right_trigger == 1) {
-                leftMotor.setPower(-.2);
-                telemetry.addData("Encoder Position", leftMotor.getCurrentPosition());
-                telemetry.update();
-            }
-            if(gamepad1.left_bumper && state == 1) {
-                state++;
-            }
-        }
-        if(state == 2) {
-            rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            int y = 0;
-            telemetry.addData("Running", "Right Motor");
-            telemetry.update();
-            while(y < 5000) {
-                if(gamepad1.left_bumper) {
-                    state++;
-                    return;
-                }
-            }
-            if(gamepad1.left_trigger == 1) {
-                rightMotor.setPower(.2);
-                telemetry.addData("Encoder Position", leftMotor.getCurrentPosition());
-                telemetry.update();
-            }
-            if(gamepad1.right_trigger == 1) {
-                rightMotor.setPower(-.2);
-                telemetry.addData("Encoder Position", rightMotor.getCurrentPosition());
-                telemetry.update();
-            }
+        telemetry.addData("Middle",middleMotor.getCurrentPosition());
+        telemetry.addData("Left",leftMotor.getCurrentPosition());
+        telemetry.addData("Right",rightMotor.getCurrentPosition());
+        telemetry.addData("Arm",glyphMotor.getCurrentPosition());
 
-            if(gamepad1.left_bumper && state == 2) {
-                state++;
-            }
-        }
-        if(state == 3) {
-            hirshIsDumb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            hirshIsDumb.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            int y = 0;
-            telemetry.addData("Running", "pulley");
-            telemetry.update();
-            while(y < 5000) {
-                if(gamepad1.left_bumper) {
-                    state++;
-                    return;
-                }
-            }
-            if(gamepad1.left_trigger == 1) {
-                hirshIsDumb.setPower(.2);
-                telemetry.addData("Encoder Position", hirshIsDumb.getCurrentPosition());
-                telemetry.update();
-            }
-            if(gamepad1.right_trigger == 1) {
-                hirshIsDumb.setPower(-.2);
-                telemetry.addData("Encoder Position", hirshIsDumb.getCurrentPosition());
-                telemetry.update();
-            }
-            if(gamepad1.left_bumper && state == 3) {
-                state++;
-            }
-        }
-        if(state == 4) {
-            arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            int y = 0;
-            telemetry.addData("Running", "Arm");
-            telemetry.update();
-            while(y < 5000) {
-                if(gamepad1.left_bumper) {
-                    state++;
-                    return;
-                }
-            }
-            if(gamepad1.left_trigger == 1) {
-                arm.setPower(.2);
-                telemetry.addData("Encoder Position", arm.getCurrentPosition());
-                telemetry.update();
-            }
-            if(gamepad1.right_trigger == 1) {
-                arm.setPower(-.2);
-                telemetry.addData("Encoder Position", arm.getCurrentPosition());
-                telemetry.update();
-            }
-            if(gamepad1.left_bumper && state == 4) {
-                state++;
-            }
-        }
     }
 
     String formatAngle(AngleUnit angleUnit, double angle) {

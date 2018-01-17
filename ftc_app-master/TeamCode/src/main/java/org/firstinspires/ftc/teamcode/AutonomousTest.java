@@ -209,6 +209,8 @@ public class AutonomousTest extends LinearOpMode {
                 }
                 break;
             } else {
+                telemetry.addData("leftMotor", leftMotor.getCurrentPosition());
+                telemetry.addData("left Motor", leftMotor.getPower());
                 telemetry.addData("VuMark", "not visible!");
                 telemetry.addData("Loops", i);
             }
