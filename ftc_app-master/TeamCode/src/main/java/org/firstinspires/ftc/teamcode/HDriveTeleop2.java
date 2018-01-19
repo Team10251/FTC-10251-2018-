@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import java.util.Locale;
 // * Created by definitly not HIRSH as he would mess it up and it would explode on 8/18/2016.
@@ -94,6 +95,9 @@ public class HDriveTeleop2 extends OpMode {
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
         middleMotor.setDirection(DcMotor.Direction.REVERSE);
         glyphMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        PIDCoefficients pid = glyphMotor.getPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
+        pid.d = 0;
+        glyphMotor.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pid);
         //1= position; 0 = encoder; 2 = power
         glyphMotorState = 1;
         arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -295,21 +299,17 @@ public class HDriveTeleop2 extends OpMode {
         }
         glyphMotor.setTargetPosition((int)position);
         if(stateGlyph == 0 && gamepad1.right_trigger == 1) {
-            glyphMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            glyphMotorState = 0;
             if(glyphCounter >= 10) {
                 stateGlyph = 1;
-                claw1.setPosition(.55);
-                claw2.setPosition(.55);
+                claw1.setPosition(.6);
+                claw2.setPosition(.5);
                 glyphCounter = 0;
             }
         }
         if(stateGlyph == 1 && gamepad1.right_trigger == 1) {
-            glyphMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            glyphMotorState = 0;
             if (glyphCounter >= 10) {
-                claw1.setPosition(.75);
-                claw2.setPosition(.4);
+                claw1.setPosition(.8);
+                claw2.setPosition(.35);
                 stateGlyph = 0;
                 glyphCounter = 0;
             }

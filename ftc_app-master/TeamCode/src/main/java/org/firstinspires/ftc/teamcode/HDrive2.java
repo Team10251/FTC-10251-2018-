@@ -65,6 +65,7 @@ public class HDrive2 extends OpMode {
     Servo IntakeServo;
     DcMotor IntakeMotor;
     public HDrive2(){
+
     }
     public void init(){
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -95,6 +96,7 @@ public class HDrive2 extends OpMode {
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
         middleMotor.setDirection(DcMotor.Direction.REVERSE);
         glyphMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         //1= position; 0 = encoder; 2 = power
         glyphMotorState = 1;
         arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -308,8 +310,6 @@ public class HDrive2 extends OpMode {
         }
         glyphMotor.setTargetPosition((int)position);
         if(stateGlyph == 0 && gamepad1.right_trigger == 1) {
-            glyphMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            glyphMotorState = 0;
             if(glyphCounter >= 10) {
                 stateGlyph = 1;
                 claw1.setPosition(.55);
@@ -318,8 +318,6 @@ public class HDrive2 extends OpMode {
             }
         }
         if(stateGlyph == 1 && gamepad1.right_trigger == 1) {
-            glyphMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            glyphMotorState = 0;
             if (glyphCounter >= 10) {
                 claw1.setPosition(.8);
                 claw2.setPosition(.35);
