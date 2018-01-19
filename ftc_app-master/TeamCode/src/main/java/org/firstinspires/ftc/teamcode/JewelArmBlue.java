@@ -27,12 +27,14 @@ public class JewelArmBlue extends LinearOpMode {
         jewelHitter.setPosition(.5);
         armServo.setPosition(.5);
         while (currentState == false) {
+            telemetry.addData("Red",sensorRGB.red());
+            telemetry.addData("Blue",sensorRGB.blue());
+            telemetry.addData("Green",sensorRGB.green());
             if (sensorRGB.red() > sensorRGB.blue() && armServo.getPosition() == .5) {
                 //turn right
-                telemetry.addData("Color =", "Red");
+                telemetry.addData("Red =", sensorRGB.red());
                 telemetry.update();
                 jewelHitter.setPosition(0);
-                currentState = true;
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
@@ -40,10 +42,9 @@ public class JewelArmBlue extends LinearOpMode {
                 }
             } else if (sensorRGB.red() < sensorRGB.blue() && armServo.getPosition() == .5) {
                 //turn left
-                telemetry.addData("Color =", "Blue");
+                telemetry.addData("Blue =", sensorRGB.blue());
                 telemetry.update();
                 jewelHitter.setPosition(1);
-                currentState = true;
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
