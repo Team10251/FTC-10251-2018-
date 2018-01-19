@@ -236,8 +236,8 @@ public class HDriveTeleop extends OpMode {
         }
         else if(gamepad1.right_bumper == true) {
             hirshIsDumb.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            claw1.setPosition(.55);
-            claw2.setPosition(.55);
+            claw1.setPosition(.6);
+            claw2.setPosition(.5);
             stateGlyph = false;
             hirshIsDumb.setPower(-.20);
             hirshIsDumb.setTargetPosition(100);

@@ -97,7 +97,7 @@ public class HDriveTeleop2 extends OpMode {
         glyphMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         PIDCoefficients pid = glyphMotor.getPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
         pid.d = 0;
-        glyphMotor.setPIDCoefficients(DcMotor.RunMode.RUN_WITHOUT_ENCODER, pid);
+        glyphMotor.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pid);
         //1= position; 0 = encoder; 2 = power
         glyphMotorState = 1;
         arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -301,8 +301,8 @@ public class HDriveTeleop2 extends OpMode {
         if(stateGlyph == 0 && gamepad1.right_trigger == 1) {
             if(glyphCounter >= 10) {
                 stateGlyph = 1;
-                claw1.setPosition(.55);
-                claw2.setPosition(.55);
+                claw1.setPosition(.6);
+                claw2.setPosition(.5);
                 glyphCounter = 0;
             }
         }
