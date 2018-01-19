@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
         import com.qualcomm.hardware.bosch.BNO055IMU;
         import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+        import com.qualcomm.robotcore.eventloop.opmode.Disabled;
         import com.qualcomm.robotcore.eventloop.opmode.OpMode;
         import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
         import com.qualcomm.robotcore.hardware.DcMotor;
@@ -21,7 +22,7 @@ package org.firstinspires.ftc.teamcode;
 
 
 // * Created by definitly not HIRSH as he would mess it up and it would explode on 8/18/2016.
-
+@Disabled
 @TeleOp(name= "HDriveTeleop Field Centric")
 public class HDriveTeleop extends OpMode {
     double[] rollAngle = new double[2], pitchAngle = new double[2], yawAngle = new double[2];
