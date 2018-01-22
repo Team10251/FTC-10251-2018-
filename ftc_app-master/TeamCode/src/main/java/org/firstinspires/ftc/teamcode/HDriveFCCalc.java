@@ -11,8 +11,8 @@ public class HDriveFCCalc {
         double robotAngle = -angle/360 * 2 * Math.PI;
         double tempVal = joystickY * Math.cos(robotAngle) - joystickX * Math.sin(robotAngle);
         double driveMiddle = joystickX * Math.cos(-robotAngle) - joystickY * Math.sin(-robotAngle);
-        double driveLeft = tempVal + turnStickX/2;
-        double driveRight = tempVal - turnStickX/2;
+        double driveLeft = tempVal + (3*turnStickX/4);
+        double driveRight = tempVal - (3*turnStickX/4);
         if (driveLeft > 1) {
             driveRight = driveRight * (1 / driveLeft);
             driveMiddle = driveMiddle * (1 / driveLeft);

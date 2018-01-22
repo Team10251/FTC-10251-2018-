@@ -31,6 +31,7 @@ public class HDriveTeleop2 extends OpMode {
     DcMotorEx glyphMotor; //Pulley
     DcMotorEx arm;
     int glyphMotorState;
+    int glyphResetCount = 0;
     Servo servo;
     Servo servo3;
     Servo claw1;
@@ -48,6 +49,7 @@ public class HDriveTeleop2 extends OpMode {
     double yAngle = 0;
     int encoder = 0;
     int shootTimer = 6;
+    boolean encoderReset = false;
     int fieldCentricCounter = 0;
     boolean bumperPressed = false;
     boolean bumperIsPressed = false;
@@ -64,6 +66,8 @@ public class HDriveTeleop2 extends OpMode {
     boolean firstY = true;
     int glyphCounter = 0;
     int glyphLevel = 0;
+    double lastLiftPosition = 0;
+    double currentLiftPosition = 0;
     Servo IntakeServo;
     DcMotor IntakeMotor;
     public HDriveTeleop2(){
@@ -107,6 +111,11 @@ public class HDriveTeleop2 extends OpMode {
         //shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     public void loop(){
+        lastLiftPosition = currentLiftPosition;
+        currentLiftPosition = glyphMotor.getCurrentPosition();
+        if(glyphResetCount < 100){
+            glyphResetCount++;
+        }
         if(glyphCounter < 10){
             glyphCounter++;
         }
@@ -188,6 +197,7 @@ public class HDriveTeleop2 extends OpMode {
             if((Double.parseDouble(angleDouble) + offset) < (yAngle + 180)) {
                 rightX = 1;
             }
+
             else{
                 rightX = 0;
             }
@@ -206,20 +216,17 @@ public class HDriveTeleop2 extends OpMode {
             lezGoSlow = false;
         }
         if(gamepad1.x && fieldCentricCounter > 9) {
-            fieldCentric = true;
+
+            fieldCentric = !fieldCentric;
+
             fieldCentricCounter = 0;
         }
-        else if(gamepad1.x == false && fieldCentricCounter > 9){
-            fieldCentric = false;
-            fieldCentricCounter = 0;
-        } else{}
         if(fieldCentric) {
             calculator.calculateMovement(leftX, leftY, rightX, Double.parseDouble(angleDouble) + offset);
         }
         else {
             calculator.calculateMovement(leftX,leftY,rightX, 0);
         }
-
         if(lezGoSlow) {
             if (!speedMode) {
                 leftMotor.setPower(.3 * calculator.getLeftDrive());
@@ -256,13 +263,8 @@ public class HDriveTeleop2 extends OpMode {
         telemetry.addData("right Motor", rightMotor.getCurrentPosition());
         telemetry.addData("Angle", Double.parseDouble(angleDouble) + offset);
         telemetry.addData("Angle 2", yAngle);
+        telemetry.addData("Puley", glyphMotor.getCurrentPosition());
         telemetry.update();
-        if(gamepad1.left_trigger == 1) {
-            glyphMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            glyphMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            glyphMotorState = 1;
-        }
-        else{}
         if(gamepad1.left_bumper == true && glyphUpDownCounter == 10) {
             glyphUpDownCounter = 0;
             if(glyphLevel < 2){
@@ -309,11 +311,28 @@ public class HDriveTeleop2 extends OpMode {
         if(position > 1370){
             position = 1370;
         }
-        if(glyphMotorState != 1){
-            glyphMotorState = 1;
-            glyphMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if(gamepad1.back){
+            encoderReset = true;
         }
-        glyphMotor.setTargetPosition((int)position);
+        if(!encoderReset) {
+            if (glyphMotorState != 1) {
+                glyphMotorState = 1;
+                glyphMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+            glyphMotor.setTargetPosition((int) position);
+        }
+        else{
+            if(glyphMotorState != 2){
+                glyphMotorState = 2;
+                glyphMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+            glyphMotor.setPower(-.01);
+            if(Math.abs(currentLiftPosition-lastLiftPosition) < 10&& glyphResetCount == 100){
+                glyphMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                glyphResetCount = 0;
+                encoderReset = false;
+            }
+        }
         if(stateGlyph == 0 && gamepad1.right_trigger == 1) {
             if(glyphCounter >= 10) {
                 stateGlyph = 1;
