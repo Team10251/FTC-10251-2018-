@@ -36,6 +36,7 @@ public class HDriveTeleop2 extends OpMode {
     Servo claw1;
     Servo claw2;
     boolean countUp = false;
+    boolean fieldCentric = true;
     int countsinceapressed = 0;
     boolean countUp2 = false;
     int countsincebpressed = 0;
@@ -47,6 +48,7 @@ public class HDriveTeleop2 extends OpMode {
     double yAngle = 0;
     int encoder = 0;
     int shootTimer = 6;
+    int fieldCentricCounter = 0;
     boolean bumperPressed = false;
     boolean bumperIsPressed = false;
     boolean hulianNotAnH = false;
@@ -111,12 +113,15 @@ public class HDriveTeleop2 extends OpMode {
         if(glyphUpDownCounter < 10){
             glyphUpDownCounter++;
         }
+        if(fieldCentricCounter < 10) {
+            fieldCentricCounter++;
+        }
         int i = 0;
         angles   = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
         angleDouble = formatAngle(angles.angleUnit, angles.firstAngle);
         float leftX = gamepad1.left_stick_x;
         float leftY = gamepad1.left_stick_y;
-        if(gamepad1.y != true) {
+        if(gamepad1.a != true) {
             rightX = gamepad1.right_stick_x;
         }
         float rightY = gamepad1.right_stick_y;
@@ -124,7 +129,7 @@ public class HDriveTeleop2 extends OpMode {
         float right = gamepad1.right_trigger;
         float leftTrigger = gamepad2.left_trigger;
         float rightTrigger = gamepad2.right_trigger;
-        boolean buttonAPressed = gamepad1.a;
+        boolean buttonAPressed = false;
         boolean buttonXPressed = gamepad1.x;
         boolean buttonAPressed2 = gamepad2.a;
         boolean buttonXPressed2 = gamepad2.x;
@@ -135,7 +140,7 @@ public class HDriveTeleop2 extends OpMode {
         //bumperPressed = gamepad1.right_bumper;
         //telemetry.addData("Gyro", angleDouble);
         //telemetry.update();
-        if(gamepad1.b){
+        if(gamepad1.right_bumper){
             claw1.setPosition(.2);
             claw2.setPosition(.8);
             stateGlyph = 1;
@@ -175,7 +180,7 @@ public class HDriveTeleop2 extends OpMode {
         //telemetry.addData("Left Stick X" , gamepad1.left_stick_y);
         //telemetry.addData("Right Stick Y" , gamepad1.right_stick_y);
         //telemetry.update();
-        if(gamepad1.y) {
+        /*if(gamepad1.y) {
             if(firstY) {
                 firstY = false;
                 yAngle = Double.parseDouble(angleDouble) + offset;
@@ -186,24 +191,44 @@ public class HDriveTeleop2 extends OpMode {
             else{
                 rightX = 0;
             }
-        }
+        }*/
         else {
             firstY = true;
         }
-        if(buttonXPressed == true){
+        if(gamepad1.b == true){
             offset = Double.parseDouble(angleDouble);
             offset = -offset;
         }
-        calculator.calculateMovement(leftX, leftY, rightX, Double.parseDouble(angleDouble) + offset);
+        if(gamepad1.a == true) {
+            lezGoSlow = true;
+        }
+        else {
+            lezGoSlow = false;
+        }
+        if(gamepad1.x && fieldCentricCounter > 9) {
+            fieldCentric = true;
+            fieldCentricCounter = 0;
+        }
+        else if(gamepad1.x == false && fieldCentricCounter > 9){
+            fieldCentric = false;
+            fieldCentricCounter = 0;
+        } else{}
+        if(fieldCentric) {
+            calculator.calculateMovement(leftX, leftY, rightX, Double.parseDouble(angleDouble) + offset);
+        }
+        else {
+            calculator.calculateMovement(leftX,leftY,rightX, 0);
+        }
+
         if(lezGoSlow) {
             if (!speedMode) {
-                leftMotor.setPower(.1 * calculator.getLeftDrive());
-                rightMotor.setPower(.1 * calculator.getRightDrive());
-                middleMotor.setPower(.2*-calculator.getMiddleDrive());
+                leftMotor.setPower(.3 * calculator.getLeftDrive());
+                rightMotor.setPower(.3 * calculator.getRightDrive());
+                middleMotor.setPower(.6*-calculator.getMiddleDrive());
             } else {
-                leftMotor.setPower(.1*calculator.getLeftDrive());
-                rightMotor.setPower(.1*calculator.getRightDrive());
-                middleMotor.setPower(.2*-calculator.getMiddleDrive());
+                leftMotor.setPower(.3*calculator.getLeftDrive());
+                rightMotor.setPower(.3*calculator.getRightDrive());
+                middleMotor.setPower(.6*-calculator.getMiddleDrive());
             }
         }
         else {
@@ -232,15 +257,6 @@ public class HDriveTeleop2 extends OpMode {
         telemetry.addData("Angle", Double.parseDouble(angleDouble) + offset);
         telemetry.addData("Angle 2", yAngle);
         telemetry.update();
-        if(gamepad1.x) {
-            arm.setPower(-.3); //4900 encoder arm counts
-        }
-        else if(gamepad1.y) {
-            arm.setPower(.3);
-        }
-        else {
-            arm.setPower(0);
-        }
         if(gamepad1.left_trigger == 1) {
             glyphMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             glyphMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -263,7 +279,7 @@ public class HDriveTeleop2 extends OpMode {
             }
             glyphMotor.setPower(.35);
         }
-        else if(gamepad1.right_bumper == true&& glyphUpDownCounter == 10) {
+        else if(gamepad1.left_trigger == 1 && glyphUpDownCounter == 10) {
             glyphUpDownCounter = 0;
             if(glyphLevel > 0){
                 glyphLevel--;
