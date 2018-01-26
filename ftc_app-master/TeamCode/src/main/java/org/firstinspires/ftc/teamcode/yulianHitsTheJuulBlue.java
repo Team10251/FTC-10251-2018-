@@ -25,6 +25,7 @@ public class yulianHitsTheJuulBlue extends LinearOpMode {
     Servo armServo;
     Servo jewelHitter;
 
+
     @Override
     public void runOpMode() {
         armServo = hardwareMap.servo.get("armServo");
@@ -33,8 +34,11 @@ public class yulianHitsTheJuulBlue extends LinearOpMode {
         // get a reference to the color sensor.
         sensorColor = hardwareMap.get(ColorSensor.class, "communismcolor");
 
+
         // get a reference to the distance sensor that shares the same name.
         sensorDistance = hardwareMap.get(DistanceSensor.class, "communismcolor");
+
+
         // hsvValues is an array that will hold the hue, saturation, and value information.
         float hsvValues[] = {0F, 0F, 0F};
 
@@ -52,7 +56,13 @@ public class yulianHitsTheJuulBlue extends LinearOpMode {
 
         // wait for the start button to be pressed.
         waitForStart();
-
+       /* jewelHitter.setPosition(0);
+        armServo.setPosition(0);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
         //bring down arm
         jewelHitter.setPosition(.5);
         armServo.setPosition(.5);
@@ -89,7 +99,7 @@ public class yulianHitsTheJuulBlue extends LinearOpMode {
             telemetry.update();
             jewelHitter.setPosition(0);
             try {
-                Thread.sleep(3000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -99,7 +109,7 @@ public class yulianHitsTheJuulBlue extends LinearOpMode {
             telemetry.update();
             jewelHitter.setPosition(1);
             try {
-                Thread.sleep(3000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
