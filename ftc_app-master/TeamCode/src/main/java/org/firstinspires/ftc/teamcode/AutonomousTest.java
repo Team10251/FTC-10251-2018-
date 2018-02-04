@@ -73,13 +73,14 @@ public class AutonomousTest extends LinearOpMode {
     Servo servo;
     double gyroDouble = 0;
     double initialAngle = 0;
+    OpenGLMatrix pose;
     Servo servo2;
     int[] yowassup = new int[13];
     @Override public void runOpMode() throws InterruptedException {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "AdauJ9r/////AAAAGQ8T4+ND3kBNj3ASq3Yz50YOL+BYwmGKT4RocYSdmEwHIwh0JAjJ2xBBwv4n3+XZObZ700pc3hmcmq+ySQEVAnKkPGq7aCpOtkGTlxQ+EJlbEu3BhSdjSeBPqYC3bxd8cEDUkdCAWCzshMdeXgknPQYwZZgzGCQAFrZquqDkiIvcq9zefTCXEO/NYjS7uC1yUQZD5wJGBBStkCQpVzg9TqzWVn6qh27dDEpfhU2VrSHh29cjMO7UWAneARLViJ7EV8337KNU5GIcn5y4AUNNXbc2M73nUOvGLeMxESvPciGdnejTTe4AG/G53LrFn1UNJB0qTg4dkkbxmjQjixbjY/P57O4TC+woidwZJpsMKkEF";
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
         VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         VuforiaTrackable relicTemplate = relicTrackables.get(0);
@@ -194,8 +195,9 @@ public class AutonomousTest extends LinearOpMode {
                 telemetry.addData("VuMark", "%s visible", vuMark);
                 telemetry.addData("right Motor", rightMotor.getCurrentPosition());
                 telemetry.addData("left Motor", leftMotor.getCurrentPosition());
-                OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
+                pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
                 telemetry.addData("Pose", format(pose));
+
                 if (pose != null) {
                     VectorF trans = pose.getTranslation();
                     Orientation rot = Orientation.getOrientation(pose, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
@@ -212,6 +214,7 @@ public class AutonomousTest extends LinearOpMode {
                 telemetry.addData("leftMotor", leftMotor.getCurrentPosition());
                 telemetry.addData("left Motor", leftMotor.getPower());
                 telemetry.addData("VuMark", "not visible!");
+                telemetry.addData("Vuforia", format(pose));
                 telemetry.addData("Loops", i);
             }
 

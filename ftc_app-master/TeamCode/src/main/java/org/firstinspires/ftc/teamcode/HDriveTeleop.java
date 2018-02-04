@@ -31,6 +31,7 @@ public class HDriveTeleop extends OpMode {
     String angleDouble = "hi";
     public double gyroAngle;
     boolean speedMode = false;
+    double scale;
     DcMotorEx leftMotor;
     DcMotorEx rightMotor;
     DcMotorEx middleMotor;
@@ -60,7 +61,9 @@ public class HDriveTeleop extends OpMode {
     boolean lezGoSlow = false;
     boolean state1;
     boolean closedClaw = false;
+    boolean timeState = true;
     boolean runningclaw = false;
+    double time = System.currentTimeMillis();
     int glyphCounter = 0;
     Servo IntakeServo;
     DcMotor IntakeMotor;
@@ -128,6 +131,25 @@ public class HDriveTeleop extends OpMode {
         boolean dPadDown  = gamepad1.dpad_down;
         boolean dPadLeft  = gamepad1.dpad_left;
         boolean dPadRight = gamepad1.dpad_right;
+        if(dPadUp && timeState == true) {
+            timeState = false;
+            time = System.currentTimeMillis();
+        }
+        else if(dPadDown && timeState == true ) {
+            timeState = false;
+            time = System.currentTimeMillis();
+        }
+        else if (dPadLeft && timeState == true) {
+            timeState = false;
+            time = System.currentTimeMillis();
+        }
+        else if  (dPadRight && timeState == true) {
+            timeState = false;
+            time = System.currentTimeMillis();
+        }
+        else {
+            timeState = true;
+        }
         //bumperPressed = gamepad1.right_bumper;
         //telemetry.addData("Gyro", angleDouble);
         //telemetry.update();
@@ -177,6 +199,7 @@ public class HDriveTeleop extends OpMode {
             offset = Double.parseDouble(angleDouble);
             offset = -offset;
         }
+        scale = ((System.currentTimeMillis()-time)/10000);
         calculator.calculateMovement(leftX, leftY, rightX, Double.parseDouble(angleDouble) + offset);
         if(lezGoSlow) {
             if (!speedMode) {
@@ -186,19 +209,18 @@ public class HDriveTeleop extends OpMode {
             } else {
                 leftMotor.setPower(.1*calculator.getLeftDrive());
                 rightMotor.setPower(.1*calculator.getRightDrive());
-                middleMotor.setPower(.2*-calculator.getMiddleDrive());
+                middleMotor.setPower(.2-calculator.getMiddleDrive());
             }
         }
         else {
-            double scale = .6;
             if (!speedMode) {
                 leftMotor.setPower(scale * calculator.getLeftDrive());
                 rightMotor.setPower(scale * calculator.getRightDrive());
-                middleMotor.setPower(.8*-calculator.getMiddleDrive());
+                middleMotor.setPower(scale*-calculator.getMiddleDrive());
             } else {
                 leftMotor.setPower(scale*calculator.getLeftDrive());
                 rightMotor.setPower(scale*calculator.getRightDrive());
-                middleMotor.setPower(.8-calculator.getMiddleDrive());
+                middleMotor.setPower(scale*-calculator.getMiddleDrive());
             }
         }
    /*   if(gamepad1.left_bumper == true) {
@@ -211,6 +233,8 @@ public class HDriveTeleop extends OpMode {
 <<<<<<< HEAD
       }*/
         telemetry.addData("arm", arm.getCurrentPosition());
+        telemetry.addData("time", System.currentTimeMillis());
+        telemetry.addData("Saved Time", time);
         telemetry.update();
         if(gamepad1.x) {
             arm.setPower(-.3); //4900 encoder arm counts
